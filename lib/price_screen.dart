@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart';
 import 'coin_data.dart';
 import 'dart:io' show Platform;
 
@@ -10,7 +9,7 @@ class PriceScreen extends StatefulWidget {
 }
 
 class _PriceScreenState extends State<PriceScreen> {
-  String selectedCurrency = 'USD';
+  String selectedCurrency = currenciesList.first;
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
@@ -28,6 +27,7 @@ class _PriceScreenState extends State<PriceScreen> {
       onChanged: (value) {
         setState(() {
           selectedCurrency = value;
+          getData();
         });
       },
     );
@@ -43,21 +43,20 @@ class _PriceScreenState extends State<PriceScreen> {
       backgroundColor: Colors.lightBlue,
       itemExtent: 32.0,
       onSelectedItemChanged: (selectedIndex) {
-        print(selectedIndex);
+        selectedCurrency = currenciesList[selectedIndex];
+        getData();
       },
       children: pickerItems,
     );
   }
 
-  String bitcoinValueInUSD = '?';
+  String bitcoinValue = '?';
 
-  // method to get the coin data from coin_data.dart
   void getData() async {
     try {
-      double data = await CoinData().getCoinData();
-
+      var data = await CoinData().getCoinData(selectedCurrency);
       setState(() {
-        bitcoinValueInUSD = data.toStringAsFixed(0);
+        bitcoinValue = data.toString();
       });
     } catch (e) {
       print(e);
@@ -67,7 +66,6 @@ class _PriceScreenState extends State<PriceScreen> {
   @override
   void initState() {
     super.initState();
-    // Call getData() when the screen loads up.
     getData();
   }
 
@@ -92,7 +90,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = $bitcoinValueInUSD USD',
+                  '1 BTC = $bitcoinValue $selectedCurrency',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -114,5 +112,3 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
-
-//asset_id_base

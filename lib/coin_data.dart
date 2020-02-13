@@ -1,5 +1,5 @@
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 const List<String> currenciesList = [
   'AUD',
@@ -31,23 +31,20 @@ const List<String> cryptoList = [
   'LTC',
 ];
 
-const coinAPIURL = 'https://rest.coinapi.io/v1/exchangerate';
-const apiKey = '1D236EAC-318F-49A7-B9CC-5FABD660A825';
+const cryptoCompareURL = 'https://min-api.cryptocompare.com/data';
 
 class CoinData {
-  Future getCoinData() async {
-    String requestURL = '$coinAPIURL/BTC/USD?apikey=$apiKey';
+  Future getCoinData(String selectedCurrency) async {
+    String requestURL =
+        '$cryptoCompareURL/price?fsym=BTC&tsyms=$selectedCurrency';
     http.Response response = await http.get(requestURL);
-
     if (response.statusCode == 200) {
       var decodedData = jsonDecode(response.body);
-      var lastPrice = decodedData['rate'];
-
+      var lastPrice = decodedData['$selectedCurrency'];
       return lastPrice;
     } else {
       print(response.statusCode);
-
-      throw 'Problem with the GET request';
+      throw 'Problem with the get request';
     }
   }
 }
