@@ -34,17 +34,22 @@ const List<String> cryptoList = [
 const cryptoCompareURL = 'https://min-api.cryptocompare.com/data';
 
 class CoinData {
+  Map<String, String> cryptoRates = {};
+
   Future getCoinData(String selectedCurrency) async {
-    String requestURL =
-        '$cryptoCompareURL/price?fsym=BTC&tsyms=$selectedCurrency';
-    http.Response response = await http.get(requestURL);
-    if (response.statusCode == 200) {
-      var decodedData = jsonDecode(response.body);
-      var lastPrice = decodedData['$selectedCurrency'];
-      return lastPrice;
-    } else {
-      print(response.statusCode);
-      throw 'Problem with the get request';
+    for (String crypto in cryptoList) {
+      String requestURL =
+          '$cryptoCompareURL/price?fsym=$crypto&tsyms=$selectedCurrency';
+      http.Response response = await http.get(requestURL);
+      if (response.statusCode == 200) {
+        var decodedData = jsonDecode(response.body);
+        var lastPrice = decodedData['$selectedCurrency'];
+        cryptoRates[crypto] = lastPrice.toStringAsFixed(0);
+      } else {
+        print(response.statusCode);
+        throw 'Problem with the get request';
+      }
     }
+    return cryptoRates;
   }
 }
