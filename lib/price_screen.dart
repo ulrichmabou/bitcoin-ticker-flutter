@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:io' show Platform;
+import 'package:http/http.dart';
 import 'coin_data.dart';
+import 'dart:io' show Platform;
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -13,7 +14,6 @@ class _PriceScreenState extends State<PriceScreen> {
 
   DropdownButton<String> androidDropdown() {
     List<DropdownMenuItem<String>> dropdownItems = [];
-
     for (String currency in currenciesList) {
       var newItem = DropdownMenuItem(
         child: Text(currency),
@@ -35,10 +35,8 @@ class _PriceScreenState extends State<PriceScreen> {
 
   CupertinoPicker iOSPicker() {
     List<Text> pickerItems = [];
-
     for (String currency in currenciesList) {
-      var newItem = Text(currency);
-      pickerItems.add(newItem);
+      pickerItems.add(Text(currency));
     }
 
     return CupertinoPicker(
@@ -49,6 +47,28 @@ class _PriceScreenState extends State<PriceScreen> {
       },
       children: pickerItems,
     );
+  }
+
+  String bitcoinValueInUSD = '?';
+
+  // method to get the coin data from coin_data.dart
+  void getData() async {
+    try {
+      double data = await CoinData().getCoinData();
+
+      setState(() {
+        bitcoinValueInUSD = data.toStringAsFixed(0);
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Call getData() when the screen loads up.
+    getData();
   }
 
   @override
@@ -72,7 +92,7 @@ class _PriceScreenState extends State<PriceScreen> {
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
                 child: Text(
-                  '1 BTC = ? USD',
+                  '1 BTC = $bitcoinValueInUSD USD',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 20.0,
@@ -94,3 +114,5 @@ class _PriceScreenState extends State<PriceScreen> {
     );
   }
 }
+
+//asset_id_base
